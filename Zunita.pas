@@ -43,7 +43,7 @@ if hod<>5 then hrac:=hrac+1;
 if hrac=5 then hrac:=1;
 //if hrac=1 then begin ImFigurkaRuzova1.enabled:=true;
 //ImFigurkaRuzova2.enabled:=true;...end;
-
+ImKostka.Enabled:=false;
 end;
 
 end.
