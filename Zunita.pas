@@ -1,6 +1,7 @@
 unit Zunita;
 
 interface
+#zmena cislo jedna
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
