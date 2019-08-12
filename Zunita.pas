@@ -1,7 +1,10 @@
 unit Zunita;
 
 interface
+<<<<<<< HEAD
 #zmena cislo jedna
+=======
+>>>>>>> master
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
