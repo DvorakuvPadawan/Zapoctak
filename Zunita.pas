@@ -2,7 +2,7 @@ unit Zunita;
 
 interface
 <<<<<<< HEAD
-#zmena cislo jedna
+
 =======
 >>>>>>> master
 
