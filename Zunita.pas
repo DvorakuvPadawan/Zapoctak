@@ -35,11 +35,25 @@ type
     ImFigurkaZluta2: TImage;
     ImFigurkaZluta3: TImage;
     ImFigurkaZluta4: TImage;
-    Memo1: TMemo;
+    Label1: TLabel;
     procedure ImKostkaClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
-    procedure ImFigurkaFialova2Click(Sender: TObject);
+    procedure ImFigurkaTyrkysova1Click(Sender: TObject);
+    procedure ImFigurkaTyrkysova2Click(Sender: TObject);
+    procedure ImFigurkaTyrkysova3Click(Sender: TObject);
+    procedure ImFigurkaTyrkysova4Click(Sender: TObject);
     procedure ImFigurkaFialova1Click(Sender: TObject);
+    procedure ImFigurkaFialova2Click(Sender: TObject);
+    procedure ImFigurkaFialova3Click(Sender: TObject);
+    procedure ImFigurkaFialova4Click(Sender: TObject);
+    procedure ImFigurkaZluta1Click(Sender: TObject);
+    procedure ImFigurkaZluta2Click(Sender: TObject);
+    procedure ImFigurkaZluta3Click(Sender: TObject);
+    procedure ImFigurkaZluta4Click(Sender: TObject);
+    procedure ImFigurkaRuzova1Click(Sender: TObject);
+    procedure ImFigurkaRuzova2Click(Sender: TObject);
+    procedure ImFigurkaRuzova3Click(Sender: TObject);
+    procedure ImFigurkaRuzova4Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -47,172 +61,285 @@ type
 
   end;
 
-
+type rekord = record
+    Obrazek:TImage;
+    Policko:byte;
+    Start:byte;
+    DomecekX:longint;
+    DomecekY:longint
+ end;
 var
 hod,hrac,n:byte;
  Form3:Tform3;
  T:TextFile;
- DomecekF:array[0..7] of integer;
- DomecekT:array[0..7] of integer;     //souradnice prvniho policka 0 Left, 1 Top
- DomecekZ:array[0..7] of integer;
- DomecekR:array[0..7] of integer;
- Figurka:array [0..15] of Timage;
  Pole:array [0..999] of integer;
- type rekord = record
-    Policko:byte;
-    NenasezenePolicko:byte;
-    Barva:byte
- end;
-
+ var Figurka:array [0..15] of rekord;
 
 implementation
 
-
-
-
-
-
-
 {$R *.dfm}
-
-
-
-
-
-
-
-
-
-
-
 
 procedure TForm3.FormActivate(Sender: TObject);
 Var i,j:byte;
-znak:char;slovo:string;
+radek:string;
 begin
 {tato procedura je taková deklerační, spustí se totiž jen při spuštění
-a bude tu např. uložení hodnot, souřadnic atd.
-Figurka[0]:=ImFigurkaTyrkysova1;
-Figurka[1]:=ImFigurkaTyrkysova2;
-Figurka[2]:=ImFigurkaTyrkysova3;
-Figurka[3]:=ImFigurkaTyrkysova4;}
-Figurka[4]:=ImFigurkaFialova1;
-Figurka[5]:=ImFigurkaFialova2;
-{Figurka[6]:=ImFigurkaFialova3;
-Figurka[7]:=ImFigurkaFialova4;
-Figurka[8]:=ImFigurkaZluta1;
-Figurka[9]:=ImFigurkaZluta2;
-Figurka[10]:=ImFigurkaZluta3;
-Figurka[11]:=ImFigurkaZluta4;
-Figurka[12]:=ImFigurkaRuzova1;
-Figurka[13]:=ImFigurkaRuzova2;
-Figurka[14]:=ImFigurkaRuzova3;
-Figurka[15]:=ImFigurkaRuzova4; n je 64 policek}
+a bude tu např. uložení hodnot, souřadnic atd.}
+Figurka[0].Obrazek:=ImFigurkaTyrkysova1;
+Figurka[1].Obrazek:=ImFigurkaTyrkysova2;
+Figurka[2].Obrazek:=ImFigurkaTyrkysova3;
+Figurka[3].Obrazek:=ImFigurkaTyrkysova4;
+Figurka[4].Obrazek:=ImFigurkaFialova1;
+Figurka[5].Obrazek:=ImFigurkaFialova2;
+Figurka[6].Obrazek:=ImFigurkaFialova3;
+Figurka[7].Obrazek:=ImFigurkaFialova4;
+Figurka[8].Obrazek:=ImFigurkaZluta1;
+Figurka[9].Obrazek:=ImFigurkaZluta2;
+Figurka[10].Obrazek:=ImFigurkaZluta3;
+Figurka[11].Obrazek:=ImFigurkaZluta4;
+Figurka[12].Obrazek:=ImFigurkaRuzova1;
+Figurka[13].Obrazek:=ImFigurkaRuzova2;
+Figurka[14].Obrazek:=ImFigurkaRuzova3;
+Figurka[15].Obrazek:=ImFigurkaRuzova4;
   n:=64;
-  assignFile(T,'souradnice.txt');
+  assignFile(T,'souradnik.txt');
   reset(T);
   i:=0;
   while not eof(T) do
   begin
-    i:=i+1;
-    Pole[i]:=0;
-    read(T,znak);
-    while znak<>' ' do
+    j:=1;
+    readln(T,radek);
+    if (ord(radek[j])>=ord('0')) and (ord(radek[j])<=ord('9')) then
     begin
-      Pole[i]:=Pole[i]*10+ord(znak)-ord('0');
-      read(T,znak);
+      i:=i+1;
+      if i<=n then
+      begin
+        Pole[i]:=0;
+        Pole[i+n]:=0;
+      end else if i<=n+16 then
+      begin
+        Figurka[i-n-1].DomecekX:=0;
+        Figurka[i-n-1].DomecekY:=0;
+      end;
     end;
-    while znak=' ' do
-    begin
-      read(T,znak);
-    end;
-    i:=i+1;
-    Pole[i]:=0;
-    while not eoln do
-    begin
-      Pole[i]:=Pole[i]*10+ord(znak)-ord('0');
-      read(T,znak);
-    end;
-    n:=i;
-    Pole[i]:=Pole[i]*10+ord(znak)-ord('0');
-    for I := 2 to n do
-    begin
-    slovo:=IntToStr(Pole[i-1]);
-    Memo1.Lines.Add(slovo);
-    slovo:=IntToStr(Pole[i]);
-    Memo1.Lines.Add(slovo);
-    end;
+
+      while (ord(radek[j])>=ord('0')) and (ord(radek[j])<=ord('9')) do
+      begin
+        if i<=n then Pole[i]:=Pole[i]*10+ord(radek[j])-ord('0') else
+        if i<=n+16 then Figurka[i-n-1].DomecekX:=Figurka[i-n-1].DomecekX*10+ord(radek[j])-ord('0');
+
+        j:=j+1;
+      end;
+      while ((ord(radek[j])<ord('0')) or (ord(radek[j])>ord('9'))) and (j<=length(radek)) do
+      begin
+        j:=j+1;
+      end;
+      while ((ord(radek[j])>=ord('0')) and (ord(radek[j])<=ord('9'))) and (j<=length(radek)) do
+      begin
+        if i<=n then Pole[i+n]:=Pole[i+n]*10+ord(radek[j])-ord('0') else
+        if i<=n+16 then Figurka[i-n-1].DomecekY:=Figurka[i-n-1].DomecekY*10+ord(radek[j])-ord('0');
+        j:=j+1;
+      end;
+
   end;
   closeFile(T);
-for i:=2*n to i:=3*n do     //inicializuje polohy figurek na 0 (aby fungovalo vykopnutí)
-    pole[i]:=0;
+  for i:= 0 to 3 do Figurka[i].Start:=6;
+  for i:= 4 to 7 do Figurka[i].Start:=24;
+  for i:= 8 to 11 do Figurka[i].Start:=38;
+  for i:= 12 to 15 do Figurka[i].Start:=56;
 
-  DomecekR[0]:=160;
-  DomecekR[1]:=551;
-  DomecekR[2]:=104;
-  DomecekR[3]:= 503;
-  DomecekR[4]:=104;
-  DomecekR[5]:= 447;
-  DomecekR[6]:=32;
-  DomecekR[7]:= 415;
-  i:=0;
   //tady nahrajeme souřadnice figurek na začátku a jejich hodnoty
+  for I := 0 to 15 do
+  begin
+    Figurka[i].Policko:=0;
+    Figurka[i].Obrazek.Left:=Figurka[i].DomecekX;
+    Figurka[i].Obrazek.Top:=Figurka[i].DomecekY;
+    Figurka[i].Obrazek.Enabled:=false;
+  end;
+  for i := 1 to 64 do
+    begin
+      pole[i+(2*n)]:=16;
+    end;
+  hrac:=0;
+  
 
 end;
 
-procedure posun(Figurka:TImage;Sender:TObject);
+
+procedure posun(CisloFigurky:byte;Sender:TObject);
 var C:TImage;I:byte;
 Begin
-    //for i := 4*hrac to 4*hrac+3 do Figurka[i].Enabled:=false;
 
-    //ImKostka.Enabled:=true;
-    {figurka.policko:=figurka.policko+hod;
-    if figurka.policko>n then figurka.policko:=figurka.policko-n;
+    if Figurka[CisloFigurky].policko>0 then
+    begin
+      //16 znamená prázdné políčko, protože figurky jsou číslované od 0, kvůli zjednodušení psaní intervalů forcyklů
+      //zde asi může být chyba (již opravená), že bez podmínky by se přepsala souřadnice uložena v Pole[2n]
+      Pole[Figurka[CisloFigurky].policko+(2*n)]:=16;
+      Figurka[CisloFigurky].policko:=Figurka[CisloFigurky].Policko+hod;
+    end else
+    begin
+      Figurka[CisloFigurky].policko:=Figurka[CisloFigurky].Start;
+    end;
 
-    figurka.left:=pole[figurka.policko];
-    figurka.top:=pole[figurka.policko+n];
-    if pole[figurka.policko+(2*n)]<>0 then                               //vykopnutí
-         pole[figurka.policko+(2*n)] - cislo figurky   .left:=domecekBARVA;
-                                       ktera tam byla  .top:=domecekBARVA; 
-pole[figurka.policko+(2*n)]:=cislo figurky, která je právě na tahu}
+    if Figurka[CisloFigurky].Policko>n then
+        Figurka[CisloFigurky].Policko:=Figurka[CisloFigurky].policko-n;
+    Figurka[CisloFigurky].Obrazek.Left:=pole[Figurka[CisloFigurky].policko];
+    Figurka[CisloFigurky].Obrazek.Top:=pole[figurka[CisloFigurky].policko+n];
+    if Pole[Figurka[CisloFigurky].policko+(2*n)]<16 then
+    begin
+      Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].policko:=0;
+      Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].Obrazek.Left:=Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].DomecekX;
+      Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].Obrazek.Top:=Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].DomecekY;
+    end;
+    Pole[Figurka[CisloFigurky].policko+(2*n)]:=CisloFigurky;
+    //slapnuti na hvezdokupu vyhazuje:
+    case Figurka[CisloFigurky].policko of
+      1,29,33,61:
+      begin
+        Pole[Figurka[CisloFigurky].policko+(2*n)]:=16;
+        Figurka[CisloFigurky].policko:=0;
+        Figurka[CisloFigurky].Obrazek.Left:=Figurka[CisloFigurky].DomecekX;
+        Figurka[CisloFigurky].Obrazek.Top:=Figurka[CisloFigurky].DomecekY;
+      end;
+    end;
+    for i := 4*hrac to 4*hrac+3 do Figurka[i].Obrazek.Enabled:=false;
+end;
+
+procedure TForm3.ImFigurkaTyrkysova1Click(Sender: TObject);
+begin
+  posun(0,Sender);
+  //toto nevím proč nefunfuje v proceduře posun, tak se to musí dát do každé Figurka.click procedury:
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaTyrkysova2Click(Sender: TObject);
+begin
+  posun(1,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaTyrkysova3Click(Sender: TObject);
+begin
+  posun(2,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaTyrkysova4Click(Sender: TObject);
+begin
+  posun(3,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaZluta1Click(Sender: TObject);
+begin
+posun(8,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaZluta2Click(Sender: TObject);
+begin
+  posun(9,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaZluta3Click(Sender: TObject);
+begin
+  posun(10,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaZluta4Click(Sender: TObject);
+begin
+  posun(11,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
 end;
 
 procedure TForm3.ImFigurkaFialova1Click(Sender: TObject);
 begin
-  posun(Figurka[4],Sender);
+  posun(4,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
 end;
 
 procedure TForm3.ImFigurkaFialova2Click(Sender: TObject);
 begin
-  posun(Figurka[5],Sender);
-end;
-procedure TForm3.ImFigurkaFialova3Click(Sender: TObject);
-begin
-  posun(Figurka[6],Sender);
-end;
-procedure TForm3.ImFigurkaFialova4Click(Sender: TObject);
-begin
-  posun(Figurka[7],Sender);
+  posun(5,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
 end;
 
-Procedure TForm3.ImKostkaClick(Sender: TObject);
+procedure TForm3.ImFigurkaFialova3Click(Sender: TObject);
+begin
+  posun(6,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaFialova4Click(Sender: TObject);
+begin
+  posun(7,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaRuzova1Click(Sender: TObject);
+begin
+  posun(12,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaRuzova2Click(Sender: TObject);
+begin
+  posun(13,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaRuzova3Click(Sender: TObject);
+begin
+  posun(13,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImFigurkaRuzova4Click(Sender: TObject);
+begin
+  posun(14,Sender);
+  ImKostka.Picture.LoadFromFile('kostka_logo.png');
+  ImKostka.Enabled:=true;
+end;
+
+procedure TForm3.ImKostkaClick(Sender: TObject);
 Var i:byte;
 begin
-hod:=random(5)+1;
+hod:=random(6)+1;
 if hod=1 then ImKostka.Picture.LoadFromFile('kostka1.png');
 if hod=2 then ImKostka.Picture.LoadFromFile('kostka2.png');
 if hod=3 then ImKostka.Picture.LoadFromFile('kostka3.png');
 if hod=4 then ImKostka.Picture.LoadFromFile('kostka4.png');
 if hod=5 then ImKostka.Picture.LoadFromFile('kostka5.png');
 if hod=6 then ImKostka.Picture.LoadFromFile('kostka6.png');
-if hod<6 then hrac:=hrac+1;
-if hrac=4 then hrac:=0;
-ImKostka.Enabled:=false;
-{for i := 4*hrac to (4*hrac)+3 do
+for i := 4*hrac to (4*hrac)+3 do
   begin
     //if je nasazená:
-    if figurka[i].policko>15 then Figurka[i].Enabled:=true;
-  end;}
+    if figurka[i].policko>0 then Figurka[i].Obrazek.Enabled:=true;
+    if (figurka[i].policko=0) and (hod=6) then Figurka[i].Obrazek.Enabled:=true;
+
+
+  end;
+  //kdyz si hrac nemuze nasadit, nemuze jet, takze kostka bude aktivní:
+for i := 4*hrac to (4*hrac)+3 do if Figurka[i].Obrazek.Enabled=true then ImKostka.Enabled:=false;
+if hod<6 then hrac:=hrac+1;
+if hrac=4 then hrac:=0;
 end;
 
 end.
