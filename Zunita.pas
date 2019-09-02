@@ -21,6 +21,20 @@ type
     ImKostka: TImage;
     ImFigurkaFialova1: TImage;
     ImFigurkaFialova2: TImage;
+    ImFigurkaFialova3: TImage;
+    ImFigurkaRuzova3: TImage;
+    ImFigurkaFialova4: TImage;
+    ImFigurkaRuzova1: TImage;
+    ImFigurkaRuzova2: TImage;
+    ImFigurkaRuzova4: TImage;
+    ImFigurkaTyrkysova1: TImage;
+    ImFigurkaTyrkysova2: TImage;
+    ImFigurkaTyrkysova3: TImage;
+    ImFigurkaTyrkysova4: TImage;
+    ImFigurkaZluta1: TImage;
+    ImFigurkaZluta2: TImage;
+    ImFigurkaZluta3: TImage;
+    ImFigurkaZluta4: TImage;
     Memo1: TMemo;
     procedure ImKostkaClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
@@ -38,6 +52,10 @@ var
 hod,hrac,n:byte;
  Form3:Tform3;
  T:TextFile;
+ DomecekF:array[0..7] of integer;
+ DomecekT:array[0..7] of integer;     //souradnice prvniho policka 0 Left, 1 Top
+ DomecekZ:array[0..7] of integer;
+ DomecekR:array[0..7] of integer;
  Figurka:array [0..15] of Timage;
  Pole:array [0..999] of integer;
  type rekord = record
@@ -89,8 +107,8 @@ Figurka[11]:=ImFigurkaZluta4;
 Figurka[12]:=ImFigurkaRuzova1;
 Figurka[13]:=ImFigurkaRuzova2;
 Figurka[14]:=ImFigurkaRuzova3;
-Figurka[15]:=ImFigurkaRuzova4; to n jsem jen tipnul pocet poli}
-  n:=60;
+Figurka[15]:=ImFigurkaRuzova4; n je 64 policek}
+  n:=64;
   assignFile(T,'souradnice.txt');
   reset(T);
   i:=0;
@@ -126,6 +144,17 @@ Figurka[15]:=ImFigurkaRuzova4; to n jsem jen tipnul pocet poli}
     end;
   end;
   closeFile(T);
+for i:=2*n to i:=3*n do     //inicializuje polohy figurek na 0 (aby fungovalo vykopnutí)
+    pole[i]:=0;
+
+  DomecekR[0]:=160;
+  DomecekR[1]:=551;
+  DomecekR[2]:=104;
+  DomecekR[3]:= 503;
+  DomecekR[4]:=104;
+  DomecekR[5]:= 447;
+  DomecekR[6]:=32;
+  DomecekR[7]:= 415;
   i:=0;
   //tady nahrajeme souřadnice figurek na začátku a jejich hodnoty
 
@@ -142,7 +171,10 @@ Begin
 
     figurka.left:=pole[figurka.policko];
     figurka.top:=pole[figurka.policko+n];
-    pole[figurka.policko+(2*n)]:=cislo figurky}
+    if pole[figurka.policko+(2*n)]<>0 then                               //vykopnutí
+         pole[figurka.policko+(2*n)] - cislo figurky   .left:=domecekBARVA;
+                                       ktera tam byla  .top:=domecekBARVA; 
+pole[figurka.policko+(2*n)]:=cislo figurky, která je právě na tahu}
 end;
 
 procedure TForm3.ImFigurkaFialova1Click(Sender: TObject);
@@ -154,8 +186,16 @@ procedure TForm3.ImFigurkaFialova2Click(Sender: TObject);
 begin
   posun(Figurka[5],Sender);
 end;
+procedure TForm3.ImFigurkaFialova3Click(Sender: TObject);
+begin
+  posun(Figurka[6],Sender);
+end;
+procedure TForm3.ImFigurkaFialova4Click(Sender: TObject);
+begin
+  posun(Figurka[7],Sender);
+end;
 
-procedure TForm3.ImKostkaClick(Sender: TObject);
+Procedure TForm3.ImKostkaClick(Sender: TObject);
 Var i:byte;
 begin
 hod:=random(5)+1;
