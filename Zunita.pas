@@ -35,7 +35,6 @@ type
     ImFigurkaZluta2: TImage;
     ImFigurkaZluta3: TImage;
     ImFigurkaZluta4: TImage;
-    Label1: TLabel;
     procedure ImKostkaClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure ImFigurkaTyrkysova1Click(Sender: TObject);
