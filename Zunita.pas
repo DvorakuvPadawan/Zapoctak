@@ -35,6 +35,7 @@ type
     ImFigurkaZluta2: TImage;
     ImFigurkaZluta3: TImage;
     ImFigurkaZluta4: TImage;
+      Label2: TLabel;
     procedure ImKostkaClick(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure ImFigurkaTyrkysova1Click(Sender: TObject);
@@ -65,10 +66,12 @@ type rekord = record
     Policko:byte;
     Start:byte;
     DomecekX:longint;
-    DomecekY:longint
+    DomecekY:longint;
+    Kolo:boolean;
  end;
 var
 hod,hrac,n:byte;
+Hraji:array [0..3] of byte;
  Form3:Tform3;
  T:TextFile;
  Pole:array [0..999] of integer;
@@ -166,7 +169,7 @@ end;
 
 
 procedure posun(CisloFigurky:byte;Sender:TObject);
-var C:TImage;I:byte;
+var C:TImage;I:byte;Label2:TLabel;ImKostka: TImage;
 Begin
 
     if Figurka[CisloFigurky].policko>0 then
@@ -180,27 +183,46 @@ Begin
       Figurka[CisloFigurky].policko:=Figurka[CisloFigurky].Start;
     end;
 
-    if Figurka[CisloFigurky].Policko>n then
+    if Figurka[CisloFigurky].Policko>n then begin
         Figurka[CisloFigurky].Policko:=Figurka[CisloFigurky].policko-n;
-    Figurka[CisloFigurky].Obrazek.Left:=pole[Figurka[CisloFigurky].policko];
-    Figurka[CisloFigurky].Obrazek.Top:=pole[figurka[CisloFigurky].policko+n];
-    if Pole[Figurka[CisloFigurky].policko+(2*n)]<16 then
+        Figurka[CisloFigurky].Kolo:=true;
+        end;
+        if Pole[Figurka[CisloFigurky].policko+(2*n)]<16 then
     begin
       Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].policko:=0;
+      Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].Kolo:=false;
       Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].Obrazek.Left:=Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].DomecekX;
       Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].Obrazek.Top:=Figurka[Pole[Figurka[CisloFigurky].policko+(2*n)]].DomecekY;
     end;
     Pole[Figurka[CisloFigurky].policko+(2*n)]:=CisloFigurky;
-    //slapnuti na hvezdokupu vyhazuje:
-    case Figurka[CisloFigurky].policko of
-      1,29,33,61:
-      begin
-        Pole[Figurka[CisloFigurky].policko+(2*n)]:=16;
-        Figurka[CisloFigurky].policko:=0;
-        Figurka[CisloFigurky].Obrazek.Left:=Figurka[CisloFigurky].DomecekX;
-        Figurka[CisloFigurky].Obrazek.Top:=Figurka[CisloFigurky].DomecekY;
+    
+    //kdyz uz figurka objela kolo, tak ji radi do ovcince ...
+	if Figurka[CisloFigurky].Kolo=true  then
+  begin
+  if Figurka[CisloFigurky].Policko>Figurka[CisloFigurky].Start then
+	  begin
+		  (*Figurka[CisloFigurky].covc:=Figurka[CisloFigurky].Policko-Figurka[CisloFigurky].Start-1;
+		  Figurka[CisloFigurky].Obrazek.Left:=Figurka[CisloFigurky].ovcinecX[Figurka[CisloFigurky].covc];
+		  Figurka[CisloFigurky].Obrazek.Top:=Figurka[CisloFigurky].ovcinecY[Figurka[CisloFigurky].covc]; *)
+      Figurka[CisloFigurky].Obrazek.Visible:=false;
+      Figurka[CisloFigurky].Policko:=100;
+      Figurka[CisloFIgurky].Obrazek.Enabled:=false;
+      Hraji[CisloFigurky div 4 ]:= Hraji[CisloFigurky div 4 ]+1;
+
+	  end
+    else begin
+          Figurka[CisloFigurky].Obrazek.Left:=pole[Figurka[CisloFigurky].policko];
+          Figurka[CisloFigurky].Obrazek.Top:=pole[figurka[CisloFigurky].policko+n];
       end;
-    end;
+
+ end
+ else begin
+            (*Figurka[CisloFigurky].Obrazek.Left:=Figurka[CisloFigurky].ovcinecX[1];
+          Figurka[CisloFigurky].Obrazek.Top:=Figurka[CisloFigurky].ovcinecY[1];  *)
+          Figurka[CisloFigurky].Obrazek.Left:=pole[Figurka[CisloFigurky].policko];
+          Figurka[CisloFigurky].Obrazek.Top:=pole[figurka[CisloFigurky].policko+n];
+      end;
+     
     for i := 4*hrac to 4*hrac+3 do Figurka[i].Obrazek.Enabled:=false;
 end;
 
@@ -210,6 +232,12 @@ begin
   //toto nevím proč nefunfuje v proceduře posun, tak se to musí dát do každé Figurka.click procedury:
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[0]=4 then begin
+       Label2.Caption:='Vyhrála jsi tyrkysová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaTyrkysova2Click(Sender: TObject);
@@ -217,6 +245,12 @@ begin
   posun(1,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+   if Hraji[0]=4 then begin
+       Label2.Caption:='Vyhrála jsi tyrkysová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaTyrkysova3Click(Sender: TObject);
@@ -224,6 +258,12 @@ begin
   posun(2,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+   if Hraji[0]=4 then begin
+       Label2.Caption:='Vyhrála jsi tyrkysová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaTyrkysova4Click(Sender: TObject);
@@ -231,6 +271,12 @@ begin
   posun(3,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+   if Hraji[0]=4 then begin
+       Label2.Caption:='Vyhrála jsi tyrkysová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaZluta1Click(Sender: TObject);
@@ -238,6 +284,12 @@ begin
 posun(8,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[2]=4 then begin
+       Label2.Caption:='Vyhrála jsi žlutá!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaZluta2Click(Sender: TObject);
@@ -245,6 +297,12 @@ begin
   posun(9,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[2]=4 then begin
+       Label2.Caption:='Vyhrála jsi žlutá!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaZluta3Click(Sender: TObject);
@@ -252,6 +310,12 @@ begin
   posun(10,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[2]=4 then begin
+       Label2.Caption:='Vyhrála jsi žlutá!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaZluta4Click(Sender: TObject);
@@ -259,6 +323,12 @@ begin
   posun(11,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[2]=4 then begin
+       Label2.Caption:='Vyhrála jsi žlutá!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaFialova1Click(Sender: TObject);
@@ -266,6 +336,12 @@ begin
   posun(4,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[1]=4 then begin
+       Label2.Caption:='Vyhrála jsi fialová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaFialova2Click(Sender: TObject);
@@ -273,6 +349,12 @@ begin
   posun(5,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[1]=4 then begin
+       Label2.Caption:='Vyhrála jsi fialová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaFialova3Click(Sender: TObject);
@@ -280,6 +362,12 @@ begin
   posun(6,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[1]=4 then begin
+       Label2.Caption:='Vyhrála jsi fialová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaFialova4Click(Sender: TObject);
@@ -287,6 +375,12 @@ begin
   posun(7,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[1]=4 then begin
+       Label2.Caption:='Vyhrála jsi fialová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaRuzova1Click(Sender: TObject);
@@ -294,33 +388,73 @@ begin
   posun(12,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[3 ]=4 then begin
+       Label2.Caption:='Vyhrála jsi ružová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaRuzova2Click(Sender: TObject);
 begin
   posun(13,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
-  ImKostka.Enabled:=true;
+  ImKostka.Enabled:=true;if Hraji[3 ]=4 then begin
+       Label2.Caption:='Vyhrála jsi ružová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaRuzova3Click(Sender: TObject);
 begin
-  posun(13,Sender);
+  posun(14,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[3 ]=4 then begin
+       Label2.Caption:='Vyhrála jsi ružová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImFigurkaRuzova4Click(Sender: TObject);
 begin
-  posun(14,Sender);
+  posun(15,Sender);
   ImKostka.Picture.LoadFromFile('kostka_logo.png');
   ImKostka.Enabled:=true;
+  if Hraji[3 ]=4 then begin
+       Label2.Caption:='Vyhrála jsi ružová!';
+       for i := 0 to 15 do
+             Figurka[i].Obrazek.Enabled:=false;
+       ImKostka.Enabled:=False  ;
+      end;
 end;
 
 procedure TForm3.ImKostkaClick(Sender: TObject);
 Var i:byte;
 begin
 hod:=random(6)+1;
+
+case hrac of
+0:  begin Label2.Caption:='tyrkysová';
+          for i:=4 to 15 do Figurka[i].Obrazek.Enabled:=false;
+    end;
+1:  begin Label2.Caption:='fialová';
+    for i:=8 to 15 do Figurka[i].Obrazek.Enabled:=false;
+    for i:= 0 to 3 do Figurka[i].Obrazek.Enabled:=false;
+    end;
+2:  begin Label2.Caption:='žlutá';
+    for i:=0 to 7 do Figurka[i].Obrazek.Enabled:=false;
+    for i:= 12 to 15 do Figurka[i].Obrazek.Enabled:=false;
+    end;
+3:  begin Label2.Caption:='růžová';
+    for i:=0 to 11 do Figurka[i].Obrazek.Enabled:=false;
+    end;
+ end;
 if hod=1 then ImKostka.Picture.LoadFromFile('kostka1.png');
 if hod=2 then ImKostka.Picture.LoadFromFile('kostka2.png');
 if hod=3 then ImKostka.Picture.LoadFromFile('kostka3.png');
@@ -330,7 +464,7 @@ if hod=6 then ImKostka.Picture.LoadFromFile('kostka6.png');
 for i := 4*hrac to (4*hrac)+3 do
   begin
     //if je nasazená:
-    if figurka[i].policko>0 then Figurka[i].Obrazek.Enabled:=true;
+    if (figurka[i].policko>0) and (figurka[i].Policko<99) then Figurka[i].Obrazek.Enabled:=true;
     if (figurka[i].policko=0) and (hod=6) then Figurka[i].Obrazek.Enabled:=true;
 
 
